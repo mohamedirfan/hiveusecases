@@ -1,0 +1,40 @@
+2. Write sqoop command to import data from customerpayments table with 2 mappers, with enclosed
+by " (As we have ',' in the data itself we are importing in sqoop using --enclosed-by option into the
+location /user/hduser/custpayments).
+sqoop import .......
+
+3. Create a hive external table and load the sqoop imported data to the hive table called custpayments.
+As we have ',' in the data itself we are using quotedchar option below with the csv serde option as given
+below as example, create the table with all columns.
+create external table custmaster (customerNumber int,customername string,contactlastname
+string,contactfirstname string)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES (
+"separatorChar" = ",",
+"quoteChar" = "\"")
+LOCATION '/user/hduser/custpayments/';
+
+4. Copy the payments.txt into hdfs location /user/hduser/paymentsdata/ and Create an external table
+namely payments with customernumber, checknumber, paymentdate, amount columns to point the
+imported payments data.
+
+create external table....
+
+5. Create an external table called cust_payments in avro format and load data by doing inner join of
+custmaster and payments tables, using insert select customernumber,
+contactfirstname,contactlastname,phone, creditlimit from custmaster and paymentdate, amount
+columns from payments table
+
+create external table...
+
+6. Create a view called custpayments_vw to only display customernumber,creditlimit,paymentdate and
+amount selected from cust_payments.
+
+create view viewname select .....;
+
+7. Extract only customernumber,creditlimit,paymentdate and amount columns either using the above
+view/cust_payments table into hdfs location /user/hduser/custpaymentsexport with '|' delimiter.
+
+8. Export the data from the /user/hduser/custpaymentsexport location to mysql table called
+cust_payments using sqoop export with staging table option using records per statement 100 and
+mappers 3.
